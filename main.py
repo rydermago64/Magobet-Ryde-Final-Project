@@ -5,9 +5,5 @@
 # Final Project Name: Cuttin' up
 # Goals:
 # move, drive fast, cut up, cool colors, turns, extoic cars, paved roads...etc.
-# oiewfineoneodknlknedv
 
 
-# test 123
-
-# test
