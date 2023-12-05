@@ -7,7 +7,7 @@ Simple overview of use/purpose.
 
 An in-depth paragraph about your project and overview of use.
 
-I will create a game were the player will be able to choose a car, 3 options. The cars will each have differnt speeds, strength, etc. The will have have a different color. There will be 1 map, with the same amount of cars that one has to zoom by and try not to hit. The road will be 3 lanes wide and will hav turns, up down, and will be difficult. There will be bright colors, and will overall be a very fun game. 
+I will create a game were the player will be able to choose a car, 3 options. The cars will each have differnt speeds, strength, etc. The will have have a different color. There will be 1 map, with the same amount of cars that one has to zoom by and try not to hit. The road will be 3 lanes wide and will hav turns, up down, and will be difficult. There will be bright colors, and will overall be a very fun game.
 ## Getting Started
 
 ### Dependencies
