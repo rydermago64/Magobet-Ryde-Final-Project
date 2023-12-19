@@ -1,126 +1,146 @@
-# This file was created by: Ryder Magobet
-
-# passionate about cars, and racing
-# make racing game
-# Final Project Name: Cuttin' up
-# Goals:
-# move, drive fast, cut up, cool colors, turns, extoic cars, paved roads...etc.
-
 import pygame
-from pygame.locals import *
+import sys
 import random
 
+# Initialize Pygame
 pygame.init()
 
-# create the window
-width = 500
-height = 500
-screen_size = (width, height)
-screen = pygame.display.set_mode (screen_size)
-pygame.display.set_caption('Car Game')
-
-# colors
-gray = (100,100,100)
-green = (76,208,56)
-red = (200,0,0)
-white = (255,255,255)
-yellow = (255,232,0)
-
-
-# game settings
-
-gameover = False
-speed = 2
+# Constants
+width = 600
+height = 400
+car_width = 50
+car_height = 80
+enemy_width = 50
+enemy_height = 80
+speed = 5
 score = 0
 
-# marker size
-marker_width = 20
-marker_height = 50
 
-# road and edge markers
-road = (100,0,300, height)
-left_edge_marker = (95,0, marker_width,height)
-right_edge_marker = (395,0, marker_width, height)
+# Colors
+black = (0, 0, 0)
+white = (255, 255, 255)
+red = (255, 0, 0)
+grey = (128,128,128)
 
 
-#  x coordinates of lanes
-left_lane = 150
-center_lane = 250
-right_lane = 350
-lanes = [left_lane, center_lane, right_lane]
 
-# for animating movement of lane markers
-lane_marker_move_y = 0
+# game over feture
+game_over_font = pygame.font.Font(None, 72)
+game_over_text = game_over_font.render("Game Over", True, white)
+game_over_rect = game_over_text.get_rect(center=(width // 2, height // 2))
 
-class Vehicle(pygame.sprite.Sprite): 
-    
+# Create the game window
+screen = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Car Racing Game")
 
-    def _init_(self,image, x,y):
-        pygame.sprite.Sprite._init_(self)
+# Load images
+car_image = pygame.image.load("Car.png")  
+enemy_image = pygame.image.load("enemy.png")
 
-        # scale the image down so it fits in the lane
-        image_scale = 45 / image.get_rect().width
-        new_width = image.get.rect().width * image_scale
-        new_height = image.get.rect().height * image_scale
-        self.image = pygame.transform.scale(image, (new_width, new_height))
 
+
+
+# Player car class
+class PlayerCar(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.transform.scale(car_image, (car_width, car_height))
         self.rect = self.image.get_rect()
-        self.rect.center = [x,y]
+        self.rect.center = (width // 2, height - 50)
 
-class PlayerVehicle(Vehicle):
+    def update(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] and self.rect.left > 0:
+            self.rect.x -= speed
+        if keys[pygame.K_RIGHT] and self.rect.right < width:
+            self.rect.x += speed
+
+# Enemy car class
+class EnemyCar(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.transform.scale(enemy_image, (enemy_width, enemy_height))
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(0, width - enemy_width)
+        self.rect.y = random.randint(-height, -enemy_height)
+
+    def update(self):
+        self.rect.y += speed
+        if self.rect.y > height:
+            self.rect.x = random.randint(0, width - enemy_width)
+            self.rect.y = random.randint(-height, -enemy_height)
+
+# oil spill sprite
+class OilSpill(pygame.sprite.Sprite):
     def __init__(self, x, y):
-        image = pygame.image.load('Car.png')
-        super().__init__(image, x, y)
+        super().__init__()
+        self.image = pygame.image.load("oil_spill.png")  # Replace with your oil spill image file
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+        self.speed = 5  # Adjust the speed as needed
 
-# players starting coordinates 
-player_x= 250
-player_y=400
+    def update(self):
+        self.rect.y += self.speed
+        if self.rect.top > height:
+            self.rect.y = random.randint(-height, -self.rect.height)
+            self.rect.x = random.randint(0, width - self.rect.width)
 
 
-# create players car
-player_group = pygame.sprite.Group()
-player = PlayerVehicle(player_x, player_y)
-player_group.add(player)
+# Create sprite groups
+all_sprites = pygame.sprite.Group()
+enemies = pygame.sprite.Group()
 
 
-# game loop
+
+# Create player car
+player_car = PlayerCar()
+all_sprites.add(player_car)
+
+# Create initial enemy cars
+for _ in range(5):  # You can adjust the number of initial enemy cars
+    enemy_car = EnemyCar()
+    all_sprites.add(enemy_car)
+    enemies.add(enemy_car)
+
+# Game loop
 clock = pygame.time.Clock()
 fps = 60
-running = True
-while running:
 
-    clock.tick(fps)
-
+while True:
     for event in pygame.event.get():
-        if event.type == QUIT:
-            running = False
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
 
+    # Update
+    all_sprites.update()
 
-        # draw the grass
-        screen.fill(green)
+    for enemy_car in enemies:
+        if enemy_car.rect.bottom > player_car.rect.bottom:
+            score += 1
 
-        # draw the road
-        pygame.draw.rect(screen, gray, road)
+    # Check for collisions with enemy cars
+    if pygame.sprite.spritecollide(player_car, enemies, False):
+        screen.blit(game_over_text, game_over_rect)
+        pygame.display.flip()
+        pygame.time.wait(2000)  # Wait for 2 seconds before quitting
+        pygame.quit()
+        sys.exit()
 
-        # draw the edge marker
-        pygame.draw.rect(screen, yellow, left_edge_marker)
-        pygame.draw.rect(screen, yellow, right_edge_marker)
+            
 
-        # draw lane markers
-        lane_marker_move_y += speed * 2
-        if lane_marker_move_y >= marker_height * 2:
-            lane_marker_move_y = 0
-        for y in range(marker_height * -2, height, marker_height * 2):
-            pygame.draw.rect(screen, white, (left_lane +45, y + lane_marker_move_y, marker_width, marker_height))
-            pygame.draw.rect(screen, white, (center_lane + 45, y +lane_marker_move_y, marker_width, marker_height))
+    # Draw
+    screen.fill(grey)
+    all_sprites.draw(screen)
 
-            # draw players car
-            player_group.draw(screen)
+    # score
+    font = pygame.font.Font(None, 36)
+    score_text = font.render(f"Score: {score}", True, white)
+    screen.blit(score_text, (10, 10))
+    
 
+    # Refresh the screen
+    pygame.display.flip()
 
-
-
-
-
-        pygame.display.update()
-
+    # Cap the frame rate
+    clock.tick(fps)
