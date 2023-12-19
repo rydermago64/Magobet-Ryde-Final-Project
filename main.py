@@ -1,3 +1,13 @@
+# This file was created by: Ryder Magobet
+
+# Goals
+# Speed gets faster and faster
+# Fun
+# Difficult but not too hard
+# Have other cars on the road
+# Use code I have never used before
+
+
 import pygame
 import sys
 import random
